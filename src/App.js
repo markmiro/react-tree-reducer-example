@@ -1,5 +1,6 @@
 import React from "react";
 import { createTree } from "./tree";
+import { ExpensiveComponent } from "./ExpensiveComponent";
 
 const initialTree = createTree({ depth: 4, fanOut: 5 });
 
@@ -32,6 +33,7 @@ function TreeItems({ tree, ids, dispatch }) {
               dispatch({ type: "UPDATE_NAME", name: e.target.value, id });
             }}
           />
+          <ExpensiveComponent cost={3} />
           <TreeItems
             tree={tree}
             ids={tree.nodes[id].childIds}
