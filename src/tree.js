@@ -1,60 +1,107 @@
-import uid from "uid";
 import faker from "faker";
 
+/**
+ * Returns a list like:
+ * `["Johnny John", "Bobby Bob", "Sally Smith"]`
+ */
 export function createList(length) {
   const generataName = () => faker.name.findName();
   return [...new Array(length)].map(generataName);
 }
 
-export function createNestedLists({ depth, fanOut }) {
-  if (depth < 1) return null;
+/**
+ * Returns a nested list like:
+ * [
+ *  {
+ *    name: "Johnny John",
+ *    children: [{ name: "Bobby Bob", children: null}]
+ *  },
+ * {
+ *  name: "Sally Smith",
+ *  children: null
+ * }
+ * ]
+ */
+export function createNestedList({ depth, fanOut }) {
+  if (depth < 1) return [];
   return createList(fanOut).map(name => ({
     name,
-    children: createNestedLists({ depth: depth - 1, fanOut })
+    children: createNestedList({ depth: depth - 1, fanOut })
   }));
 }
 
-export function normalizeNestedLists(nestedArr) {
-  const initial = { rootChildIds: [], nodes: {} };
-  if (!nestedArr) return initial;
+/**
+ * Returns nested lists that are normalized:
+ * {
+ *  topIds: ["id0", "id1"],
+ *  nodes: {
+ *    "id0": {
+ *      name: "Johhny John",
+ *      childIds: ["id0_A"]
+ *    },
+ *    "id0_A": {
+ *      name: "Bobby Bob",
+ *      childIds: []
+ *    },
+ *    "id1": {
+ *      name: "Sally Smith",
+ *      childIds: []
+ *    }
+ *  }
+ * }
+ */
+export function normalizeNestedList(nestedList) {
+  if (!nestedList) throw new Error("Requires a list");
+  const initial = { topIds: [], nodes: {} };
 
-  return nestedArr.reduce((acc, { name, children }) => {
-    const id = uid();
-    const normalizedChildren = normalizeNestedLists(children);
-    const childIds = normalizedChildren.rootChildIds;
+  return nestedList.reduce((acc, item) => {
+    if (!item.children) {
+      const itemId = faker.random.uuid();
+      return {
+        ...acc,
+        topIds: [...acc.topIds, itemId],
+        nodes: {
+          ...acc.nodes,
+          [itemId]: { name: item.name, childIds: [] }
+        }
+      };
+    }
+
+    const itemId = faker.random.uuid();
+    const itemChildrenNormalized = normalizeNestedList(item.children);
     return {
       ...acc,
-      rootChildIds: [...acc.rootChildIds, id],
+      topIds: [...acc.topIds, itemId],
       nodes: {
         ...acc.nodes,
-        [id]: {
-          name,
-          childIds
+        [itemId]: {
+          name: item.name,
+          childIds: itemChildrenNormalized.topIds
         },
-        ...normalizedChildren.nodes
+        ...itemChildrenNormalized.nodes
       }
     };
   }, initial);
 }
 
-export function normalizeNestedListsWithRoot(nestedArr) {
-  const { nodes, rootChildIds } = normalizeNestedLists(nestedArr);
-  const rootId = uid();
-
-  return {
-    rootId,
-    nodes: {
-      [rootId]: {
-        name: "ROOT",
-        childIds: rootChildIds
-      },
-      ...nodes
-    }
-  };
+export function createTree({ depth, fanOut }) {
+  return normalizeNestedList(createNestedList({ depth, fanOut }));
 }
 
-export function createTree({ depth, fanOut }) {
-  const nested = createNestedLists({ depth, fanOut });
-  console.log(nested);
-  return normalizeNestedLists(nested);
+export function treeReducer(tree, action) {
+  switch (action.type) {
+    case "UPDATE_NAME":
+      return {
+        ...tree,
+        nodes: {
+          ...tree.nodes,
+          [action.id]: {
+            ...tree.nodes[action.id],
+            name: action.name
+          }
+        }
+      };
+    default:
+      return tree;
+  }
 }

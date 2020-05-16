@@ -5,17 +5,21 @@ function randomColor() {
   return `rgb(${rand255()}, ${rand255()}, ${rand255()})`;
 }
 
+/**
+ * This component helps to visualize expensive operations.
+ * Use the `cost` prop integer to scale up and down the cost
+ */
 export function ExpensiveComponent({ cost = 1 }) {
   return (
-    <div>
-      {[...new Array(cost)].map(() => (
+    <div style={{ display: "flex", flexWrap: "wrap" }}>
+      {[...new Array(cost)].map((_, i) => (
         <div
+          key={i}
           style={{
-            display: "inline-block",
             width: 4,
             height: 4,
             backgroundColor: randomColor(),
-            marginRight: 1
+            flexShrink: 0
           }}
         />
       ))}
