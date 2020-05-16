@@ -1,5 +1,7 @@
 import faker from "faker";
 
+faker.seed(123);
+
 /**
  * Returns a list like:
  * `["Johnny John", "Bobby Bob", "Sally Smith"]`
