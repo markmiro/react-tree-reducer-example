@@ -26,7 +26,7 @@ export function TreeItem({ id }) {
                 dispatch({ type: "UPDATE_NAME", name: e.target.value, id });
               }}
             />
-            <ExpensiveComponent cost={20} />
+            {/* <ExpensiveComponent cost={10} /> */}
           </div>
           <div className={c(isDragging && style.draggingDisable)}>
             {node.childIds.length > 0 && <TreeItemsMemo ids={node.childIds} />}

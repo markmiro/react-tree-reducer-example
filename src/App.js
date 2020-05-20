@@ -6,7 +6,7 @@ import { createStore } from "redux";
 import { Provider, useSelector } from "react-redux";
 import { DragDropArea } from "./DragDrop";
 
-const initialTree = createTree({ depth: 3, fanOut: 3 });
+const initialTree = createTree({ depth: 6, fanOut: 3 });
 const store = createStore(treeReducer, initialTree);
 
 function Tree() {
@@ -23,9 +23,12 @@ function Tree() {
   }
 
   return (
-    <DragDropArea onDrop={handleDrop}>
-      <TreeItemsMemo ids={tree.topIds} />
-    </DragDropArea>
+    <div>
+      <b>Nodes: </b> {Object.keys(tree.nodes).length}
+      <DragDropArea onDrop={handleDrop}>
+        <TreeItemsMemo ids={tree.topIds} />
+      </DragDropArea>
+    </div>
   );
 }
 
