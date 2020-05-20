@@ -1,6 +1,6 @@
 import { createStore } from "redux";
 import React, { useEffect } from "react";
-import { Provider, createDispatchHook } from "react-redux";
+import { Provider, createDispatchHook, createSelectorHook } from "react-redux";
 
 const initialState = {
   fromId: null,
@@ -10,6 +10,7 @@ const initialState = {
 
 const DragDropContext = React.createContext(initialState);
 
+export const useDragSelector = createSelectorHook(DragDropContext);
 const useDragDispatch = createDispatchHook(DragDropContext);
 
 function reducer(state, action) {
@@ -19,6 +20,12 @@ function reducer(state, action) {
       return {
         ...state,
         fromId: action.fromId
+      };
+    }
+    case "DRAG_OVER": {
+      return {
+        ...state,
+        measurements: action.measurements
       };
     }
     case "DROP": {
@@ -76,11 +83,46 @@ export function DragDropItem({ id, children }) {
     },
     onDragOver: e => {
       e.preventDefault(); // Make it possible for `onDrop` to get called when it happens
-      if (isDragging) return;
       e.stopPropagation();
+      if (isDragging) return;
+
+      // https://stackoverflow.com/a/35940276
+      function getScrollParent(node) {
+        if (node == null) {
+          return null;
+        }
+
+        if (node.scrollHeight > node.clientHeight) {
+          return node;
+        } else {
+          return getScrollParent(node.parentNode);
+        }
+      }
+
+      const el = e.currentTarget;
+      const scrollParent = getScrollParent(el);
+      dragDispatch({
+        type: "DRAG_OVER",
+        measurements: {
+          top: el.offsetTop,
+          left: el.offsetLeft,
+          width: el.offsetWidth,
+          height: el.offsetHeight,
+          // Sometimes there's no scroll parent because no parents are currently scrollable
+          mouseX: e.clientX + (scrollParent?.scrollLeft || 0),
+          mouseY: e.clientY + (scrollParent?.scrollTop || 0)
+        }
+      });
+
       setIsOver(true);
     },
-    onDragLeave: () => setIsOver(false),
+    onDragLeave: () => {
+      setIsOver(false);
+      dragDispatch({
+        type: "DRAG_OVER",
+        measurements: null
+      });
+    },
     onDrop: e => {
       e.stopPropagation();
       dragDispatch({

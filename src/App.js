@@ -5,6 +5,7 @@ import { ReadMe } from "./ReadMe";
 import { createStore } from "redux";
 import { Provider, useSelector } from "react-redux";
 import { DragDropArea } from "./DragDrop";
+import { DragToOverlay } from "./DragToOverlay";
 
 const initialTree = createTree({ depth: 6, fanOut: 3 });
 const store = createStore(treeReducer, initialTree);
@@ -26,6 +27,7 @@ function Tree() {
     <div>
       <b>Nodes: </b> {Object.keys(tree.nodes).length}
       <DragDropArea onDrop={handleDrop}>
+        <DragToOverlay />
         <TreeItemsMemo ids={tree.topIds} />
       </DragDropArea>
     </div>

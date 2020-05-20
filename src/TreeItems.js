@@ -13,13 +13,7 @@ export function TreeItem({ id }) {
     <DragDropItem id={id}>
       {({ dragProps, isOver, isDragging }) => (
         <li {...dragProps}>
-          <div
-            className={c(
-              style.item,
-              isOver && style.over,
-              isDragging && style.draggingDisable
-            )}
-          >
+          <div className={c(style.item, isDragging && style.draggingDisable)}>
             <input
               value={node.name}
               onChange={e => {
