@@ -1,0 +1,14 @@
+.item {
+  background-color: #00000022;
+  border-bottom: 1px solid #00000055;
+  padding: 5px;
+}
+
+.draggingDisable {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.over {
+  background-color: green;
+}

@@ -92,7 +92,7 @@ export function createTree({ depth, fanOut }) {
 
 export function treeReducer(tree, action) {
   switch (action.type) {
-    case "UPDATE_NAME":
+    case "UPDATE_NAME": {
       return {
         ...tree,
         nodes: {
@@ -103,6 +103,10 @@ export function treeReducer(tree, action) {
           }
         }
       };
+    }
+    case "MOVE_TO": {
+      return tree;
+    }
     default:
       return tree;
   }
